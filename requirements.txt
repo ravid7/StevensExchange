@@ -1,2 +1,4 @@
 yahoo_fin=0.8.5
 html5lib=1.0.1
+cryptography=2.9.2
+sqlite3=2.6.0

@@ -1,13 +1,12 @@
 '''
-*****************************
+**************************************
 **************
 ***************
-
+rrathor2@stevens.edu, ravid7.github.io
 ***************
 **************
-*****************************
+**************************************
 '''
-
 
 from yahoo_fin.stock_info import *
 from yahoo_fin.options import *
@@ -23,6 +22,8 @@ top_labels = [
     "LYFT", "TWTR", "NFLX", "TSLA"
 ]
 
+final_label = []
+
 color_strings = [
     "list-group-item-primary",
     "list-group-item-secondary",
@@ -37,12 +38,13 @@ color_strings = [
 
 def live_price_editor():
     for i in range(len(top_labels)):
-        top_labels[i] += " (%.2f)" % get_live_price(top_labels[i])
+        final_label.append(" (%.2f)" % get_live_price(top_labels[i]))
 
 
 @app.route('/')
 def main():
-    return render_template('main_page.html', title="StevensEx Stock monitor", labels=zip(color_strings, top_labels))
+    return render_template('main_page.html', title="StevensEx Stock monitor", \
+         labels=zip(color_strings, final_label))
 
 # print(top_labels)
 
