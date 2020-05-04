@@ -22,8 +22,16 @@ from sqlite3 import Error
 from flask import Flask, Markup, render_template, url_for, flash, \
     redirect
 from signin_login import RegisterationForm, LoginForm
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'ef7d72b3b1ec8f38952eb95b9bb6b6f1'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/site.db'
+db = SQLAlchemy(app)
+
+from models import User, Subscription
+
 
 labels = [
     'JAN', 'FEB', 'MAR', 'APR',
@@ -93,6 +101,6 @@ def login():
 
 if __name__ == '__main__':
     live_price_editor()
-    app.config['SECRET_KEY'] = 'ef7d72b3b1ec8f38952eb95b9bb6b6f1'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://site.db'
+    
+    # db.create_all()
     app.run('127.0.0.1', 8080, debug=True)
