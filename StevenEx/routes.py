@@ -1,37 +1,11 @@
-'''
-**************************************
-
-<<<<<<<<<<<<<<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>
-<<<<<<<<<<<<<<<<<<<<<<<<<   >>>>>>>>>>>>>>>>>>>>>>>>>>
-<<<<<<<<<<<<<<<<<<                  >>>>>>>>>>>>>>>>>>
-<<<<<<<<<<<<<<      -------------      >>>>>>>>>>>>>>
-<<<<<<< rrathor2@stevens.edu, ravid7.github.io >>>>>>>
-<<<<<<<<<<<<<<                          >>>>>>>>>>>>>>
-<<<<<<<<<<<<<<<<<<                  >>>>>>>>>>>>>>>>>>
-<<<<<<<<<<<<<<<<<<<<<<<<<   >>>>>>>>>>>>>>>>>>>>>>>>>>
-<<<<<<<<<<<<<<<<<<<<<<<<<<|>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-**************************************
-'''
-
+from StevenEx.models import User, Subscription
 from yahoo_fin.stock_info import *
 from yahoo_fin.options import *
-import pandas as pd
-import sqlite3
-from sqlite3 import Error
-from flask import Flask, Markup, render_template, url_for, flash, \
+from flask import Markup, render_template, url_for, flash, \
     redirect
-from signin_login import RegisterationForm, LoginForm
-from flask_sqlalchemy import SQLAlchemy
+from StevenEx import app
+from StevenEx.signin_login import RegisterationForm, LoginForm
 from datetime import datetime
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ef7d72b3b1ec8f38952eb95b9bb6b6f1'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/site.db'
-db = SQLAlchemy(app)
-
-from models import User, Subscription
-
 
 labels = [
     'JAN', 'FEB', 'MAR', 'APR',
@@ -99,8 +73,3 @@ def login():
             flash('Make sure you enter your credentials correctly! Failed to login.', 'danger')
     return render_template('login.html', title="Sign in", form=login)
 
-if __name__ == '__main__':
-    live_price_editor()
-    
-    # db.create_all()
-    app.run('127.0.0.1', 8080, debug=True)
