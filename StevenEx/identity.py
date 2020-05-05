@@ -1,25 +1,28 @@
 from cryptography.fernet import Fernet
 import re
-
+import os
 
 class Identity:
 
-    def __init__(self, name, email, password):
+    def __init__(self):
         super().__init__()
-        self.name = name
-        self.email = email
-        self.password = password
-        self.key = self.keyInitializer()
+        self.key = self.keyInitializer().encode('UTF-8')
+        self.cipher = Fernet(self.key)
 
-    def validate(self, secret):
-        cipher_suite = Fernet(self.key)
-        print(cipher_suite.encrypt())
+    def encrypt(self, password):
+        password = password.encode('UTF-8')
+        return self.cipher.encrypt(password)
+
+
+    def match(self, db_key, passed):
+        cipher_suit = Fernet(self.key)
+        return self.cipher.decrypt(db_key.encode()).decode() == passed
 
     def keyInitializer(self):
-        file_key = open('keyCryp', 'r')
+        path = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(path, 'credentials/keyCryp')
+        file_key = open(path, 'r')
         x = file_key.readline()
-        x = re.search(r"([a-zA-Z0-9]+)", x)
+        x = re.search(r"([a-zA-Z0-9=]+)", x)
         return x.group(0)
 
-
-# i.validate(b"ravirathore")
