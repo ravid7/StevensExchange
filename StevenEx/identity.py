@@ -15,7 +15,6 @@ class Identity:
 
 
     def match(self, db_key, passed):
-        cipher_suit = Fernet(self.key)
         return self.cipher.decrypt(db_key.encode()).decode() == passed
 
     def keyInitializer(self):

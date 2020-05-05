@@ -27,3 +27,12 @@ class Subscription(db.Model):
 
     def __repr__(self):
         return f'User(\'{self.item}\', \'{self.date}\')'
+
+
+# class Currencies(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     seperatedvalues = db.Column(db.String(2000), nullable=True)
+#     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+#     def __repr__(self):
+#         return f'Currencies(\'{self.seperatedvalues}\',\'{self.date}\')'

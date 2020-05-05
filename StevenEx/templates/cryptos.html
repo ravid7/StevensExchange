@@ -1,0 +1,22 @@
+{% extends 'common.html' %}
+{% block content %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">No.</th>
+    {% for label in labels %}
+        <th scope="col">{{label}}</th>
+    {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+        {% for content in contents %}    
+        <tr>
+        {% for c in content %}
+            <td>{{c}}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

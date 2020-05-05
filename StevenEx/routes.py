@@ -4,10 +4,11 @@ from yahoo_fin.options import *
 from flask import Markup, render_template, url_for, flash, \
     redirect, request
 from StevenEx import app, db
-from StevenEx.signin_login import RegisterationForm, LoginForm, SearchForm
+from StevenEx.forms import RegisterationForm, LoginForm, SearchForm
 from datetime import datetime
 from StevenEx.identity import Identity
 from flask_login import login_user, current_user, logout_user, login_required
+from StevenEx.scrapper import *
 
 legend = 'Monthly Data'
 labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
@@ -31,17 +32,26 @@ color_strings = [
     "list-group-item-dark"
 ]
 
+time_crypto = datetime.utcnow()
+
+crypto_labels = ['Symbol', 'Name', 'Price (Intraday)', 'Change', '% Change', 'Market Cap',
+ 'Volume in Currency (Since 0:00 UTC)', 'Volume in Currency (24Hr)',
+ 'Total Volume All Currencies (24Hr)', 'Circulating Supply']
+
+crypto_content = []
+
+initial_crypto = True
 
 def live_price_editor():
     for i in range(len(top_labels)):
         final_label.append(top_labels[i] + " (%.2f)" % get_live_price(top_labels[i]))
 
+
+
 @app.route('/home')
 @app.route('/', methods=['GET', 'POST'])
 def main():
     search_form = SearchForm(request.form)
-    line_labels = labels
-    line_values = values
     if request.method == 'POST':
         return search_results(search_form)
     return render_template('main_page.html', title="StevensEx Stock monitor", \
@@ -89,3 +99,17 @@ def logout():
 @app.route('/results')
 def search_results(search):
     return "<h1>Bitch</h1>"
+
+@app.route('/cryptos')
+def my_cryptos():
+    global initial_crypto, crypto_content, crypto_labels, time_crypto
+    mins = datetime.utcnow() - time_crypto
+    if(initial_crypto or mins.seconds > 180):
+        time_crypto = datetime.utcnow()
+        initial_crypto = False
+        table_name = 'crypto_data'
+        top = get_top_crypto(22)
+        top.to_sql(table_name, con=db.engine, if_exists='replace')
+        crypto_content = db.engine.execute(f'SELECT * FROM {table_name}').fetchall()
+    return render_template('cryptos.html', title="Crypto Currencies", 
+    labels=crypto_labels, contents=(crypto_content))
