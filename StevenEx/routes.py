@@ -2,25 +2,16 @@ from StevenEx.models import User, Subscription
 from yahoo_fin.stock_info import *
 from yahoo_fin.options import *
 from flask import Markup, render_template, url_for, flash, \
-    redirect
+    redirect, request
 from StevenEx import app, db
-from StevenEx.signin_login import RegisterationForm, LoginForm
+from StevenEx.signin_login import RegisterationForm, LoginForm, SearchForm
 from datetime import datetime
 from StevenEx.identity import Identity
 from flask_login import login_user, current_user, logout_user, login_required
 
-labels = [
-    'JAN', 'FEB', 'MAR', 'APR',
-    'MAY', 'JUN', 'JUL', 'AUG',
-    'SEP', 'OCT', 'NOV', 'DEC'
-]
-
-values = [
-    967.67, 1190.89, 1079.75, 1349.19,
-    2328.91, 2504.28, 2873.83, 4764.87,
-    4349.29, 6458.30, 9907, 16297
-]
-
+legend = 'Monthly Data'
+labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
+values = [10, 9, 8, 7, 6, 4, 7, 8]
 
 top_labels = [
     "MSFT", "AAPL", "UBER", "GPRO",
@@ -46,13 +37,16 @@ def live_price_editor():
         final_label.append(top_labels[i] + " (%.2f)" % get_live_price(top_labels[i]))
 
 @app.route('/home')
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def main():
+    search_form = SearchForm(request.form)
     line_labels = labels
     line_values = values
-    print(current_user.is_authenticated)
+    if request.method == 'POST':
+        return search_results(search_form)
     return render_template('main_page.html', title="StevensEx Stock monitor", \
-         top_labels=zip(color_strings, final_label), max=17000, labels=line_labels, values=line_values)
+         top_labels=zip(color_strings, final_label),
+         form=search_form,  values=values, labels=labels, legend=legend)
 
 # print(top_labels)
 
@@ -90,3 +84,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main'))
+
+
+@app.route('/results')
+def search_results(search):
+    print("bitch")
