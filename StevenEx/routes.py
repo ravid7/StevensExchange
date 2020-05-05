@@ -88,4 +88,4 @@ def logout():
 
 @app.route('/results')
 def search_results(search):
-    print("bitch")
+    return "<h1>Bitch</h1>"
