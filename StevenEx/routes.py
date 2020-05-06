@@ -1,8 +1,7 @@
 from StevenEx.models import User, Subscription
 from yahoo_fin.stock_info import *
 from yahoo_fin.options import *
-from flask import Markup, render_template, url_for, flash, \
-    redirect, request
+from flask import Markup, render_template, url_for, flash, redirect, request
 from StevenEx import app, db
 from StevenEx.forms import RegisterationForm, LoginForm, SearchForm
 from datetime import datetime
@@ -53,9 +52,9 @@ def live_price_editor():
 def main():
     search_form = SearchForm(request.form)
     if request.method == 'POST':
-        return search_results(search_form)
+        return redirect(url_for('search_results', result=search_form.search.data))
     return render_template('main_page.html', title="StevensEx Stock monitor", \
-         top_labels=zip(color_strings, final_label),
+         top_labels=zip(color_strings, final_label, top_labels),
          form=search_form,  values=values, labels=labels, legend=legend)
 
 # print(top_labels)
@@ -96,9 +95,9 @@ def logout():
     return redirect(url_for('main'))
 
 
-@app.route('/results')
-def search_results(search):
-    return "<h1>Bitch</h1>"
+@app.route('/discovery/<result>')
+def search_results(result):
+    return render_template("result.html", title=result)
 
 @app.route('/cryptos')
 def my_cryptos():
