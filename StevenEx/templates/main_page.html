@@ -9,11 +9,22 @@
   </div>
   <br>
   <div class="row justify-content-center">
-    <div class="column" style="width: 30%; position: relative;">
-      <form method="POST" class="form-inline active-pink-3 active-pink-4">
-        {{ form.search }}
-        <button class="btn btn-red btn-rounded btn-sm my-0" type="submit">Search</button>
-      </form>
+    <div class="column" style="width: 30%">
+      <div class="column justify-content-center">
+          <h2 class="h2">Query your Stock</h2>
+          <form method="POST" class="form-inline active-pink-3 active-pink-4">
+            {{ form.search }}
+            <button class="btn btn-red btn-rounded btn-sm my-0" type="submit">Search</button>
+          </form>
+      </div>
+      <div class="column justify-content-center">
+        <div class="list-group">
+          <a class="list-group-item list-group-item-action active text-white">Previous Searches</a>
+          {% for item in searched_items %}
+            <a href="{{url_for('search_results', result=item.item)}}" class="list-group-item list-group-item-action">{{item.item}}</a>
+          {% endfor %}
+        </div>
+      </div>
     </div> 
     <div class="column" style="width: 50%;">
       <canvas id="chart"></canvas>

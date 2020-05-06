@@ -1,5 +1,5 @@
-from StevenEx.models import User, Subscription
-from yahoo_fin.stock_info import *
+from StevenEx.models import User, Subscription, Search
+from yahoo_fin.stock_info import get_live_price, get_quote_table
 from yahoo_fin.options import *
 from flask import Markup, render_template, url_for, flash, redirect, request
 from StevenEx import app, db
@@ -8,6 +8,7 @@ from datetime import datetime
 from StevenEx.identity import Identity
 from flask_login import login_user, current_user, logout_user, login_required
 from StevenEx.scrapper import *
+# import numpy as np
 
 legend = 'Monthly Data'
 labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
@@ -45,19 +46,30 @@ def live_price_editor():
     for i in range(len(top_labels)):
         final_label.append(top_labels[i] + " (%.2f)" % get_live_price(top_labels[i]))
 
-
+def ticker_info(ticker):
+    site = "https://finance.yahoo.com/quote/" + ticker + "?p=" + ticker        
+    tables = pd.read_html(site)
+    try:
+        return tables[0][1][0]
+    except:
+        return None
 
 @app.route('/home')
 @app.route('/', methods=['GET', 'POST'])
 def main():
+    db.create_all()
     search_form = SearchForm(request.form)
+    searched_items = Search.query.limit(10).all()
     if request.method == 'POST':
+        search = Search(item=search_form.search.data)
+        db.session.add(search)
+        db.session.commit()
         return redirect(url_for('search_results', result=search_form.search.data))
     return render_template('main_page.html', title="StevensEx Stock monitor", \
          top_labels=zip(color_strings, final_label, top_labels),
-         form=search_form,  values=values, labels=labels, legend=legend)
+         form=search_form,  values=values, labels=labels, legend=legend, searched_items=searched_items)
 
-# print(top_labels)
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -73,6 +85,7 @@ def register():
         flash(f'Account created for {register.username.data}!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title="Sign up", form=register)
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -96,10 +109,11 @@ def logout():
 
 
 @app.route('/discovery/<result>')
-def search_results(result):
-    data = None
-    if result:
-        data = get_quote_table(result)
+def search_results(result):  
+    if ticker_info(result) is None:
+        flash('Invalid Entry', 'danger')
+        return redirect(url_for('main'))
+    data = get_quote_table(result)
     return render_template("result.html", title=result, bulk=zip(data.keys(), data.values()))
 
 @app.route('/cryptos')

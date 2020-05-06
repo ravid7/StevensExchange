@@ -28,6 +28,13 @@ class Subscription(db.Model):
     def __repr__(self):
         return f'User(\'{self.item}\', \'{self.date}\')'
 
+class Search(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    item = db.Column(db.String(20), unique=False, nullable=False)
+
+    def __repr__(self):
+        return f'User(\'{self.item}\')'    
+
 
 # class Currencies(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
