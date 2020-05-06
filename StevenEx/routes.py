@@ -97,7 +97,10 @@ def logout():
 
 @app.route('/discovery/<result>')
 def search_results(result):
-    return render_template("result.html", title=result)
+    data = None
+    if result:
+        data = get_quote_table(result)
+    return render_template("result.html", title=result, bulk=zip(data.keys(), data.values()))
 
 @app.route('/cryptos')
 def my_cryptos():
