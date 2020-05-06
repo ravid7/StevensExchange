@@ -40,16 +40,13 @@ from StevenEx.identity import Identity
 # # date = datetime.utcnow() - curr.date
 # # print(date.seconds > 3)
 # db.drop_all()
-import pandas as pd
-# from yahoo_fin.stock_info import *
-def ticker_info(ticker):
-    site = "https://finance.yahoo.com/quote/" + ticker + "?p=" + ticker        
-    tables = pd.read_html(site)
-    try:
-        return tables[0][1][0]
-    except:
-        return None
-print(ticker_info('marketplace'))
+
+from yahoo_fin.stock_info import *
+
+print(get_day_gainers())
+# data = (get_data("msft", interval = "1d", start_date = then_date , end_date = curr_date))
+# x = (data['high'] + data['low'])/2
+# print(x)
 # import numpy as np
 # ticker = "MSFT-C"
 # # site = "https://finance.yahoo.com/quote/" + ticker + "?p=" + ticker

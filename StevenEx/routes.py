@@ -1,5 +1,5 @@
 from StevenEx.models import User, Subscription, Search
-from yahoo_fin.stock_info import get_live_price, get_quote_table
+from yahoo_fin.stock_info import get_live_price, get_quote_table, get_data
 from yahoo_fin.options import *
 from flask import Markup, render_template, url_for, flash, redirect, request
 from StevenEx import app, db
@@ -8,6 +8,7 @@ from datetime import datetime
 from StevenEx.identity import Identity
 from flask_login import login_user, current_user, logout_user, login_required
 from StevenEx.scrapper import *
+from datetime import datetime, timedelta, date
 # import numpy as np
 
 legend = 'Monthly Data'
@@ -53,6 +54,25 @@ def ticker_info(ticker):
         return tables[0][1][0]
     except:
         return None
+
+def list_my_plot(ticker):
+    curr = datetime.utcnow()
+    diff = 20
+    then = curr - timedelta(days=diff)
+    curr_date = curr.strftime("%m/%d/%y")
+    then_date = then.strftime("%m/%d/%y")
+    chart_dates = []
+    def perdelta(start, end, delta):
+        curr = start
+        while curr < end:
+            yield curr
+            curr += delta
+    for  i in perdelta(date(then.year, then.month, then.day), 
+    date(curr.year, curr.month, curr.day), timedelta(days=1)):
+        chart_dates.append(i.strftime("%d/%m"))
+    data = get_data("msft", interval = "1d", start_date = then_date , end_date = curr_date)
+    ave_value = (data['high'] + data['low'])/2
+    return chart_dates, ave_value
 
 @app.route('/home')
 @app.route('/', methods=['GET', 'POST'])
@@ -114,7 +134,9 @@ def search_results(result):
         flash('Invalid Entry', 'danger')
         return redirect(url_for('main'))
     data = get_quote_table(result)
-    return render_template("result.html", title=result, bulk=zip(data.keys(), data.values()))
+    chart_dates, ave_value = list_my_plot(result)
+    return render_template("result.html", title=result, bulk=zip(data.keys(), data.values()), 
+    values=ave_value, labels=chart_dates, legend="20 dollars")
 
 @app.route('/cryptos')
 def my_cryptos():
