@@ -1,9 +1,9 @@
-from StevenEx.models import User, Subscription, Search
+from StevenEx.models import User, Subscription, Search, Currencies
 from yahoo_fin.stock_info import get_live_price, get_quote_table, get_data
 from yahoo_fin.options import *
 from flask import Markup, render_template, url_for, flash, redirect, request
 from StevenEx import app, db
-from StevenEx.forms import RegisterationForm, LoginForm, SearchForm
+from StevenEx.forms import RegisterationForm, LoginForm, SearchForm, AddLib
 from datetime import datetime
 from StevenEx.identity import Identity
 from flask_login import login_user, current_user, logout_user, login_required
@@ -128,15 +128,25 @@ def logout():
     return redirect(url_for('main'))
 
 
-@app.route('/discovery/<result>')
+@app.route('/discovery/<result>', methods=['GET', 'POST'])
 def search_results(result):  
+    add = AddLib(request.form)
+    check = Currencies.query.filter_by(seperatedvalues=result).scalar()
+    if request.method == 'POST':
+        if check:
+            Currencies.query.filter_by(seperatedvalues=result).delete()
+        else:
+            curr = Currencies(seperatedvalues=result)
+            db.session.add(curr)
+            db.session.commit()
+        return redirect(url_for('library'))
     if ticker_info(result) is None:
         flash('Invalid Entry', 'danger')
         return redirect(url_for('main'))
     data = get_quote_table(result)
     chart_dates, ave_value = list_my_plot(result)
-    return render_template("result.html", title=result, bulk=zip(data.keys(), data.values()), 
-    values=ave_value, labels=chart_dates, legend="20 dollars")
+    return render_template("result.html", title=result, bulk=zip(data.keys(), data.values()), \
+    values=ave_value, labels=chart_dates, legend="20 dollars", button=current_user.is_authenticated, check=(check))
 
 @app.route('/cryptos')
 def my_cryptos():
@@ -151,3 +161,11 @@ def my_cryptos():
         crypto_content = db.engine.execute(f'SELECT * FROM {table_name}').fetchall()
     return render_template('cryptos.html', title="Crypto Currencies", 
     labels=crypto_labels, contents=(crypto_content))
+
+
+@app.route('/lib')
+def library():
+    if not current_user.is_authenticated:
+        return redirect(url_for('main'))
+    currency = Currencies.query.all()
+    return render_template('library.html', data=currency)

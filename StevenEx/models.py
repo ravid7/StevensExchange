@@ -36,10 +36,10 @@ class Search(db.Model):
         return f'User(\'{self.item}\')'    
 
 
-# class Currencies(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     seperatedvalues = db.Column(db.String(2000), nullable=True)
-#     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+class Currencies(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    seperatedvalues = db.Column(db.String(2000), nullable=True)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-#     def __repr__(self):
-#         return f'Currencies(\'{self.seperatedvalues}\',\'{self.date}\')'
+    def __repr__(self):
+        return f'Currencies(\'{self.seperatedvalues}\',\'{self.date}\')'

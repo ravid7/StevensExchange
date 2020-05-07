@@ -29,3 +29,6 @@ class LoginForm(FlaskForm):
 class SearchForm(Form):
     search = StringField('Search for life.', [DataRequired()], render_kw={'class': 'form-control form-control-sm ml-3 w-75', 'placeholder': 'Search for your life'})
     submit = SubmitField('Search')
+
+class AddLib(Form):
+    submit = SubmitField('+ ADD')
