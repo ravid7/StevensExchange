@@ -14,7 +14,6 @@ from time import sleep
 from StevenEx.models import User, Subscription, Search, Currencies
 from StevenEx.identity import Identity
 
-db.create_all()
 # passw = "gAAAAABesHz5C97H_QUTzHFQxRc9g1HEJNHoFEVjA33nNF_I7jCZcyBsU5iB7eI6LPsp0Xgdhuwv0SIfw0UKPoZe17PJh57nAQ=="
 # # user = User(username="Ravi", email="ravid7.github", password=passw)
 # # user = User(username="xRavi", email="xravid7.github", password=passw)
@@ -41,14 +40,10 @@ db.create_all()
 # # print(date.seconds > 3)
 # db.drop_all()
 
-# from yahoo_fin.stock_info import *
+from yahoo_fin.stock_info import *
 # from models import Currencies
-curr = Currencies(seperatedvalues='UBER')
-db.session.add(curr)
-db.session.remove(curr)
-db.session.commit()
-check = Currencies.query.filter_by(seperatedvalues='UBER').scalar()
-print(check)
+v = get_day_gainers()
+print(v['Price (Intraday)'])
 # print(get_day_gainers())
 # data = (get_data("msft", interval = "1d", start_date = then_date , end_date = curr_date))
 # x = (data['high'] + data['low'])/2

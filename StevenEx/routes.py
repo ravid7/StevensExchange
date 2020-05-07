@@ -1,5 +1,5 @@
 from StevenEx.models import User, Subscription, Search, Currencies
-from yahoo_fin.stock_info import get_live_price, get_quote_table, get_data
+from yahoo_fin.stock_info import get_live_price, get_quote_table, get_data, _raw_get_daily_info
 from yahoo_fin.options import *
 from flask import Markup, render_template, url_for, flash, redirect, request
 from StevenEx import app, db
@@ -33,15 +33,15 @@ color_strings = [
     "list-group-item-dark"
 ]
 
-time_crypto = datetime.utcnow()
+time_crypto, time_stats = datetime.utcnow(), datetime.utcnow()
 
 crypto_labels = ['Symbol', 'Name', 'Price (Intraday)', 'Change', '% Change', 'Market Cap',
  'Volume in Currency (Since 0:00 UTC)', 'Volume in Currency (24Hr)',
  'Total Volume All Currencies (24Hr)', 'Circulating Supply']
 
-crypto_content = []
+crypto_content, gainers, losers, actives = [], [], [], []
 
-initial_crypto = True
+initial_crypto, initial_stats = True, True
 
 def live_price_editor():
     for i in range(len(top_labels)):
@@ -70,9 +70,38 @@ def list_my_plot(ticker):
     for  i in perdelta(date(then.year, then.month, then.day), 
     date(curr.year, curr.month, curr.day), timedelta(days=1)):
         chart_dates.append(i.strftime("%d/%m"))
-    data = get_data("msft", interval = "1d", start_date = then_date , end_date = curr_date)
+    data = get_data(ticker, interval = "1d", start_date = then_date , end_date = curr_date)
     ave_value = (data['high'] + data['low'])/2
     return chart_dates, ave_value
+
+def get_day_most_active(max):
+    
+    return _raw_get_daily_info(f"https://finance.yahoo.com/most-active?offset=0&count={max}")
+    # list_ = list(x.values.tolist())
+    # return list_
+
+def get_day_gainers(max):
+    
+    return  _raw_get_daily_info(f"https://finance.yahoo.com/gainers?offset=0&count={max}")
+    # list_ = list(x.values.tolist())
+    # return list_
+
+def get_day_losers(max):
+    
+    return _raw_get_daily_info(f"https://finance.yahoo.com/losers?offset=0&count={max}")
+    # list_ = list(x.values.tolist())
+    # return list_
+
+records = ['Symbol', 'Name', 'Price (Intraday)', 'Change', '% Change', 'Volume',
+ 'Avg Vol (3 month)', 'Market Cap', 'PE Ratio (TTM)']
+
+
+# time_crypto = datetime.utcnow()
+#         initial_crypto = False
+#         table_name = 'crypto_data'
+#         top = get_top_crypto(22)
+#         top.to_sql(table_name, con=db.engine, if_exists='replace')
+#         crypto_content = db.engine.execute(f'SELECT * FROM {table_name}').fetchall()
 
 @app.route('/home')
 @app.route('/', methods=['GET', 'POST'])
@@ -85,10 +114,23 @@ def main():
         db.session.add(search)
         db.session.commit()
         return redirect(url_for('search_results', result=search_form.search.data))
+    global initial_stats, gainers, losers, actives, time_stats
+    mins = datetime.utcnow() - time_stats
+    if(initial_stats or (mins.seconds > 30*60)):
+        initial_stats = False
+        time_stats = datetime.utcnow()
+        gainers_name, losers_name, actives_name = 'gainers_data', 'losers_data', 'actives_data'
+        top_gainers, top_losers, top_actives = get_day_gainers(5), get_day_losers(5), get_day_most_active(5)
+        top_gainers.to_sql(gainers_name, con=db.engine, if_exists='replace')
+        top_losers.to_sql(losers_name, con=db.engine, if_exists='replace')
+        top_actives.to_sql(actives_name, con=db.engine, if_exists='replace')
+        gainers = db.engine.execute(f'SELECT * FROM {gainers_name}').fetchall()
+        losers = db.engine.execute(f'SELECT * FROM {losers_name}').fetchall()
+        actives = db.engine.execute(f'SELECT * FROM {actives_name}').fetchall()
     return render_template('main_page.html', title="StevensEx Stock monitor", \
          top_labels=zip(color_strings, final_label, top_labels),
-         form=search_form,  values=values, labels=labels, legend=legend, searched_items=searched_items)
-
+         form=search_form,  values=values, labels=labels, legend=legend, searched_items=searched_items, 
+         records=records, gainers=gainers, losers=losers, actives=actives)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -152,7 +194,7 @@ def search_results(result):
 def my_cryptos():
     global initial_crypto, crypto_content, crypto_labels, time_crypto
     mins = datetime.utcnow() - time_crypto
-    if(initial_crypto or mins.seconds > 180):
+    if(initial_crypto or mins.seconds > 5*60):
         time_crypto = datetime.utcnow()
         initial_crypto = False
         table_name = 'crypto_data'
