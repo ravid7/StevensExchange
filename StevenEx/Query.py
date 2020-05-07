@@ -37,9 +37,4 @@ class Inject:
         self.connection.close()
 
 
-i = Inject()
-i.drop("lov")
-i.create("CREATE TABLE lov ( name text, email text, password text )")
-i.insert("lov", "a", "d", "ds")
-print(i.get("lov").fetchall())
-i.close()
+
