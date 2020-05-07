@@ -9,6 +9,7 @@ from StevenEx.identity import Identity
 from flask_login import login_user, current_user, logout_user, login_required
 from StevenEx.scrapper import *
 from datetime import datetime, timedelta, date
+import random
 # import numpy as np
 
 legend = 'Monthly Data'
@@ -103,6 +104,8 @@ records = ['Symbol', 'Name', 'Price (Intraday)', 'Change', '% Change', 'Volume',
 #         top.to_sql(table_name, con=db.engine, if_exists='replace')
 #         crypto_content = db.engine.execute(f'SELECT * FROM {table_name}').fetchall()
 
+m_chart, m_val = [], []
+chosen = 'MSFT'
 @app.route('/home')
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -114,7 +117,7 @@ def main():
         db.session.add(search)
         db.session.commit()
         return redirect(url_for('search_results', result=search_form.search.data))
-    global initial_stats, gainers, losers, actives, time_stats
+    global initial_stats, gainers, losers, actives, time_stats, m_chart, m_val, chosen
     mins = datetime.utcnow() - time_stats
     if(initial_stats or (mins.seconds > 30*60)):
         initial_stats = False
@@ -127,10 +130,15 @@ def main():
         gainers = db.engine.execute(f'SELECT * FROM {gainers_name}').fetchall()
         losers = db.engine.execute(f'SELECT * FROM {losers_name}').fetchall()
         actives = db.engine.execute(f'SELECT * FROM {actives_name}').fetchall()
+        values = Currencies.query.all()
+        size = len(values)
+        item = random.randint(0,size-1)
+        chosen = Currencies.query.get(item).seperatedvalues
+        m_chart, m_val = list_my_plot(chosen)
     return render_template('main_page.html', title="StevensEx Stock monitor", \
          top_labels=zip(color_strings, final_label, top_labels),
-         form=search_form,  values=values, labels=labels, legend=legend, searched_items=searched_items, 
-         records=records, gainers=gainers, losers=losers, actives=actives)
+         form=search_form,  values=m_val, labels=m_chart, legend=legend, searched_items=searched_items, 
+         records=records, gainers=gainers, losers=losers, actives=actives, chosen=chosen)
 
 
 @app.route("/register", methods=['GET', 'POST'])
