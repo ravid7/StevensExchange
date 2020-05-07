@@ -10,11 +10,11 @@
           </tr>
     </thead>
     <tbody>
-        {% for i in data %}
+        {% for d in data %}
             <tr>
-            <th scope="row">{{i.id}}</th>
-            <td>{{i.seperatedvalues}}</td>
-            <td>{{i.date}}</td>
+            <th scope="row">{{d.id}}</th>
+            <td>{{d.seperatedvalues}}</td>
+            <td>{{d.date}}</td>
         </tr>
         {% endfor %}
     </tbody>
