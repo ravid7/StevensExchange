@@ -1,7 +1,8 @@
 from flask import Flask, Markup, render_template
 import json
+import os
 
-with open('months.json') as data_file:    
+with open('./StevenEx/months.json') as data_file:    
     months = json.load(data_file)
 
 app = Flask(__name__)

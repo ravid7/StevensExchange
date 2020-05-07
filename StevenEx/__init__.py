@@ -18,7 +18,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
 
+path = './StevenEx/databases'
+access_right = 0o755
+if not os.path.isdir(path):
+    try:
+        os.mkdir(path)
+    except OSError:
+        print ("Creation of the directory %s failed" % path)
+        exit()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ef7d72b3b1ec8f38952eb95b9bb6b6f1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
