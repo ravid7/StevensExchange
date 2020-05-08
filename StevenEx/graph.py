@@ -2,8 +2,11 @@ from flask import Flask, Markup, render_template
 import json
 import os
 
-with open('./StevenEx/months.json') as data_file:    
+with open('./StevensEx/months.json') as data_file:    
     months = json.load(data_file)
+
+with open('./StevensEx/values.json') as data_file:    
+    valuesGraph = json.load(data_file)
 
 app = Flask(__name__)
 
@@ -14,16 +17,18 @@ app = Flask(__name__)
 # ]
 
 labels = [
-    months['january'], months['feburvary'], months['march'], months['april'],
-    months['may'], months['june'], months['july'], months['august'],
-    months['september'], months['october'], months['november'], months['december']
+    months['months']['january'], months['months']['feburvary'], months['months']['march'], months['months']['april'],
+    months['months']['may'], months['months']['june'], months['months']['july'], months['months']['august'],
+    months['months']['september'], months['months']['october'], months['months']['november'], months['months']['december']
 ]
 
-values = [
-    967.67, 1190.89, 1079.75, 1349.19,
-    2328.91, 2504.28, 2873.83, 4764.87,
-    4349.29, 6458.30, 9907, 16297
-]
+# values = [
+#     967.67, 1190.89, 1079.75, 1349.19,
+#     2328.91, 2504.28, 2873.83, 4764.87,
+#     4349.29, 6458.30, 9907, 16297
+# ]
+
+values = valuesGraph['graph']["values"]
 
 colors = [
     "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
