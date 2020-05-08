@@ -18,9 +18,7 @@ values = [10, 9, 8, 7, 6, 4, 7, 8]
 
 # Hard coding the best public stock company to display on portal 
 top_labels = [
-    "MSFT", "AAPL", "UBER", "GPRO",
-    "LYFT", "TWTR", "NFLX", "TSLA"
-]
+    "MSFT", "AAPL", "UBER", "GPRO","LYFT", "TWTR", "NFLX", "TSLA"]
 
 final_label = []
 
@@ -81,13 +79,13 @@ def get_day_most_active(max):
     return _raw_get_daily_info(f"https://finance.yahoo.com/most-active?offset=0&count={max}")
     
 
-# Get todays prise gainer 
+# Get today's top gainer 
 def get_day_gainers(max):
     
     return  _raw_get_daily_info(f"https://finance.yahoo.com/gainers?offset=0&count={max}")
     
 
-# // Get Todays losers 
+# // Get Today's top losers 
 def get_day_losers(max):
     
     return _raw_get_daily_info(f"https://finance.yahoo.com/losers?offset=0&count={max}")
