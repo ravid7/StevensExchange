@@ -8,12 +8,12 @@ class Identity:
         super().__init__()
         self.key = self.keyInitializer().encode('UTF-8')
         self.cipher = Fernet(self.key)
-
+    #encrypt password
     def encrypt(self, password):
         password = password.encode('UTF-8')
         return self.cipher.encrypt(password)
 
-
+    #decrypt and match password
     def match(self, db_key, passed):
         return self.cipher.decrypt(db_key.encode()).decode() == passed
 
