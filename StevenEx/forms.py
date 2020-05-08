@@ -5,9 +5,12 @@ from StevenEx.models import User
 
 # //Register a new user to portal through form 
 class RegisterationForm(FlaskForm):
+    #defining validators for Username, email, password,confirm password- 
+    # we have to make sure we don't forget Equal to in confirm pass
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    # equal to checklist - Done( FOI )
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), 
                                             EqualTo('password')])
     submit = SubmitField('Sign Up')

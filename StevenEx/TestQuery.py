@@ -1,7 +1,5 @@
 import sqlite3
 
-# FIXME: is it even needed.
-
 class Inject:
 
     def __init__(self, temp=False):
@@ -21,20 +19,10 @@ class Inject:
         self.finalize()
         return result
 
-    def get(self, table):
-        result = self.cursor.execute('SELECT * FROM {}'.format(table))
-        self.finalize()
-        return result
 
-    def drop(self, table):
-        self.cursor.execute("DROP TABLE IF EXISTS {}".format(table))
-        self.finalize()
 
     def finalize(self):
         self.connection.commit()
 
     def close(self):
         self.connection.close()
-
-
-

@@ -1,5 +1,6 @@
 from flask import Flask, Markup, render_template
 import json
+import os
 
 with open('./StevensEx/months.json') as data_file:    
     months = json.load(data_file)
@@ -53,7 +54,7 @@ def line():
 def pie():
     pie_labels = labels
     pie_values = values
-    return render_template('pie_chart.html', title='Bitcoin Monthly Price in USD', max=17000, set=zip(values, labels, colors))
+    return render_template('pie_chart.html', title='Bitcoin Monthly Price in USD($)', max=17000, set=zip(values, labels, colors))
 
 
 if __name__ == '__main__':

@@ -125,9 +125,13 @@ def main():
         losers = db.engine.execute(f'SELECT * FROM {losers_name}').fetchall()
         actives = db.engine.execute(f'SELECT * FROM {actives_name}').fetchall()
         values = Currencies.query.all()
-        size = len(values)
-        item = random.randint(0,size-1)
-        chosen = Currencies.query.get(item).seperatedvalues
+        if values:
+            print("inside")
+            size = len(values)
+            item = random.randint(0,size-1)
+            chosen = Currencies.query.get(item).seperatedvalues 
+        else:
+            chosen = 'MSFT'    
         m_chart, m_val = list_my_plot(chosen)
     return render_template('main_page.html', title="StevensEx Stock monitor", \
          top_labels=zip(color_strings, final_label, top_labels),
