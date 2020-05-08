@@ -10,12 +10,13 @@ from flask_login import login_user, current_user, logout_user, login_required
 from StevenEx.scrapper import *
 from datetime import datetime, timedelta, date
 import random
-# import numpy as np
+
 
 legend = 'Monthly Data'
 labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
 values = [10, 9, 8, 7, 6, 4, 7, 8]
 
+# Hard coding the best public stock company to display on portal 
 top_labels = [
     "MSFT", "AAPL", "UBER", "GPRO",
     "LYFT", "TWTR", "NFLX", "TSLA"
@@ -78,31 +79,24 @@ def list_my_plot(ticker):
 def get_day_most_active(max):
     
     return _raw_get_daily_info(f"https://finance.yahoo.com/most-active?offset=0&count={max}")
-    # list_ = list(x.values.tolist())
-    # return list_
+    
 
+# Get todays prise gainer 
 def get_day_gainers(max):
     
     return  _raw_get_daily_info(f"https://finance.yahoo.com/gainers?offset=0&count={max}")
-    # list_ = list(x.values.tolist())
-    # return list_
+    
 
+# // Get Todays losers 
 def get_day_losers(max):
     
     return _raw_get_daily_info(f"https://finance.yahoo.com/losers?offset=0&count={max}")
-    # list_ = list(x.values.tolist())
-    # return list_
+   
 
 records = ['Symbol', 'Name', 'Price (Intraday)', 'Change', '% Change', 'Volume',
  'Avg Vol (3 month)', 'Market Cap', 'PE Ratio (TTM)']
 
 
-# time_crypto = datetime.utcnow()
-#         initial_crypto = False
-#         table_name = 'crypto_data'
-#         top = get_top_crypto(22)
-#         top.to_sql(table_name, con=db.engine, if_exists='replace')
-#         crypto_content = db.engine.execute(f'SELECT * FROM {table_name}').fetchall()
 
 m_chart, m_val = [], []
 chosen = 'MSFT'
@@ -144,7 +138,7 @@ def main():
          form=search_form,  values=m_val, labels=m_chart, legend=legend, searched_items=searched_items, 
          records=records, gainers=gainers, losers=losers, actives=actives, chosen=chosen)
 
-
+# Registering user to database with data send from fron-end to backend 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -160,7 +154,9 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title="Sign up", form=register)
 
-
+# Authorization of user to portal 
+# when user clicks submit button on login 
+# the front-end will send request to backend
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -176,6 +172,7 @@ def login():
             flash('Make sure you enter your credentials correctly! Failed to login.', 'danger')
     return render_template('login.html', title="Sign in", form=login)
 
+# Signning out user from portal
 @app.route("/logout")
 def logout():
     logout_user()
