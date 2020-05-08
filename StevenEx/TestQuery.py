@@ -19,6 +19,15 @@ class Inject:
         self.finalize()
         return result
 
+    def get(self, table):
+        result = self.cursor.execute('SELECT * FROM {}'.format(table))
+        self.finalize()
+        return result
+
+    def drop(self, table):
+        self.cursor.execute("DROP TABLE IF EXISTS {}".format(table))
+        self.finalize()
+
 
 
     def finalize(self):
